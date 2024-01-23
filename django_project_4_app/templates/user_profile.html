@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
+
+{% block content %}
+    <div class="col-md-9 col-lg-10">
+        <div class="block profile_info">
+            <div class="my-3 profile_image">
+                <img src="{{ user.image.url }}" class="profile_ava">
+            </div>
+            <div class="profile_data my-3">
+                {% csrf_token %}
+                <p class="text-white my-3"><b>{{ user.username }}</b></p>
+                {% if current_user != user %}
+                    <button id="follow" data-id="{{ user.id }}" data-url="{% url 'follow_user' user.id %}" class="{% if is_followed %}profile_unfol{% else %}profile_fol{% endif %}">
+                        <span id="action">{% if is_followed %}Unfollow{% else %}Follow{% endif %}</span>
+                    </button>
+                {% endif %}
+                <p class="text-white my-3">Followers: <span id="followers">{{ followers }}</span> | Following: {{ following }}</p>
+            </div>
+        </div>
+        <div>
+            <p class="my-3 text-center text-white">Posts</p>
+        </div>
+        <div class="posts">
+            {% if posts %}
+                {% for p in posts %}
+                    <div class="fill mx-1">
+                        <a><img class="post_image my-2" data-id="{{ p.id }}" src="{{ p.image.url }}"></a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'path/to/ajax_functions.js' %}"></script>
+{% endblock %}

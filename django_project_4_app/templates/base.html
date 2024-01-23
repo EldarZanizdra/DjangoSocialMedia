@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    {% block title %} {% endblock %}
+    {% block import %} {% endblock %}
+</head>
+<body class="body_back">
+    <div class="container-fluid" id="main">
+        <div class="row">
+            <div class="side_bar col-md-3 col-lg-2">
+                <div class="content">
+                    <br>
+                    <a class='nav mt-4' href="/registration"> <text class="nav_link">Register</text></a><br>
+                    <a class='nav mt-4' href="/login"> <text class="nav_link">Login</text></a><br>
+                    <a class='nav mt-4' href="/logout"> <text class="nav_link">Logout</text></a><br>
+                    <a class='nav mt-4' href="/search"> <text class="nav_link">Search</text></a><br>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-lg-2">
+                <input type="hidden">
+            </div>
+
+            {% block content %} {% endblock %}
+        </div>
+    </div>
+    {% block extra %}{% endblock %}
+</body>
+</html>

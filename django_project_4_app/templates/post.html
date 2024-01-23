@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Post Detail{% endblock %}
+
+{% block content %}
+  <h2>{{ post.title }}</h2>
+  <p>{{ post.content }} - {{ post.author }}</p>
+  {% if post.image %}
+    <img src="{{ post.image.url }}" alt="Post Image">
+  {% endif %}
+
+  <h3>Comments:</h3>
+  <ul>
+    {% for comment in comments %}
+      <li>{{ comment.body }} - {{ comment.author.username }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Add a Comment:</h3>
+  <form method="post" action="{% url 'post_detail' pk=post.id %}">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit" name="comment_submit">Add Comment</button>
+  </form>
+
+  <h3>Edit Post:</h3>
+  <form method="post" action="{% url 'post_detail' pk=post.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ post_edit_form.as_p }}
+    <button type="submit" name="post_edit_submit">Save Changes</button>
+  </form>
+
+  <a href="{% url 'home' %}">Go to Home</a>
+{% endblock %}
+
+
+
+
+
+
+

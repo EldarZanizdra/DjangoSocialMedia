@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+  <h2>Profile</h2>
+  <p>{{ user.username }}</p>
+  <a href="{% url 'create_post' %}">Create Post</a>
+
+  <h3>Your Posts:</h3>
+  <ul>
+    {% for post in posts %}
+      <li>
+        {{ post.content }} - {{ post.created_at }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+

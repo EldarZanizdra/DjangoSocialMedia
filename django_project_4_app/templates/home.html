@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <h2>Home</h2>
+
+  {% if search_query %}
+    <h3>Search Results for '{{ search_query }}':</h3>
+  {% else %}
+    <h3>Latest Posts:</h3>
+  {% endif %}
+  <ul>
+    {% for post in posts %}
+      <li>
+        <a href="{% url 'post_detail' pk=post.pk %}">Details</a>
+        <!-- Display Post Image if available -->
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post Image">
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'create_post' %}">Create Post</a>
+{% endblock %}
+
+
+
