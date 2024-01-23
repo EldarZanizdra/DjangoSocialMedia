@@ -90,6 +90,47 @@ class PostView(TemplateView):
         return redirect('post_detail', pk=post.id)
 
 
+@method_decorator(login_required, name='dispatch')
+class PostEditView(TemplateView):
+    template_name = 'edit_post.html'
+
+    def get(self, request, *args, **kwargs):
+        post = get_object_or_404(Post, id=self.kwargs['pk'])
+
+        # Check if the current user is the author of the post
+        if post.author != request.user:
+            return redirect('post_detail', pk=post.id)
+
+        context = {
+            'post': post,
+            'post_edit_form': PostForm(instance=post),
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(Post, id=self.kwargs['pk'])
+
+        # Check if the current user is the author of the post
+        if post.author != request.user:
+            return redirect('post_detail', pk=post.id)
+
+        post_edit_form = PostForm(request.POST, request.FILES, instance=post)
+
+        if post_edit_form.is_valid():
+            post_edit_form.save()
+
+        return redirect('post_detail', pk=post.id)
+
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(Post, id=self.kwargs['pk'])
+        post_edit_form = PostForm(request.POST, request.FILES, instance=post)
+
+        if post_edit_form.is_valid():
+            post_edit_form.save()
+
+        return redirect('post_detail', pk=post.id)
+
+
 class RegistrationView(CreateView):
     template_name = 'registration.html'
     model = User

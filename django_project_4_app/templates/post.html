@@ -23,15 +23,13 @@
     <button type="submit" name="comment_submit">Add Comment</button>
   </form>
 
-  <h3>Edit Post:</h3>
-  <form method="post" action="{% url 'post_detail' pk=post.id %}" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ post_edit_form.as_p }}
-    <button type="submit" name="post_edit_submit">Save Changes</button>
-  </form>
+  {% if user.is_authenticated and user == post.author %}
+    <h3><a href="{% url 'edit_post' pk=post.id %}">Edit Post</a></h3>
+  {% endif %}
 
   <a href="{% url 'home' %}">Go to Home</a>
 {% endblock %}
+
 
 
 

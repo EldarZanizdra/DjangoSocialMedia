@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block content %}
+  <h2>Edit Post</h2>
+  <form method="post" action="{% url 'edit_post' pk=post.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ post_edit_form.as_p }}
+    <button type="submit" name="post_edit_submit">Save Changes</button>
+  </form>
+  <a href="{% url 'home' %}">Go to Home</a>
+{% endblock %}
