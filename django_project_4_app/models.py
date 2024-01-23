@@ -12,7 +12,6 @@ class User(AbstractUser):
     website = models.CharField(max_length=250, null=True, default='', blank=True)
     image = models.ImageField(upload_to='media/profs/', default='media/profs/default.png')
 
-
 class Follow(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     followers = models.ManyToManyField(User, related_name='followers', blank=True)

@@ -25,10 +25,16 @@ from django.db.models import F
 class ProfileView(TemplateView):
     template_name = 'profile.html'
 
-    def get(self, request, *args, **kwargs):
-        posts = Post.objects.filter(author=request.user)
-        form = PostForm()
-        return render(request, self.template_name, {'posts': posts, 'form': form})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['posts'] = Post.objects.filter(author=self.request.user)
+        context['form'] = PostForm()
+
+        # Get followers and following counts
+        context['followers_count'] = Follow.objects.filter(following=self.request.user).count()
+        context['following_count'] = Follow.objects.filter(followers=self.request.user).count()
+
+        return context
 
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
@@ -38,8 +44,9 @@ class ProfileView(TemplateView):
             post.save()
             return redirect('profile')
         else:
-            posts = Post.objects.filter(author=request.user)
-            return render(request, self.template_name, {'posts': posts, 'form': form})
+            context = self.get_context_data()
+            context['form'] = form
+            return render(request, self.template_name, context)
 
 
 class CreatePostView(TemplateView):
@@ -167,20 +174,20 @@ class UserProfileView(TemplateView):
         data_post = request.POST
         current_user = self.request.user
         current_user_follow, _ = Follow.objects.get_or_create(user=current_user)
-        f_user = get_object_or_404(User, id=data_post['follow'])
-        f_user_follow, _ = Follow.objects.get_or_create(user=f_user)
+        user_to_follow = get_object_or_404(User, id=data_post['follow'])
+        user_to_follow_follow, _ = Follow.objects.get_or_create(user=user_to_follow)
 
         if data_post['is_followed'] == '0':
-            current_user_follow.following.add(f_user)
-            f_user_follow.followers.add(current_user)
+            current_user_follow.following.add(user_to_follow)
+            user_to_follow_follow.followers.add(current_user)
         else:
-            current_user_follow.following.remove(f_user)
-            f_user_follow.followers.remove(current_user)
+            current_user_follow.following.remove(user_to_follow)
+            user_to_follow_follow.followers.remove(current_user)
 
         current_user_follow.save()
-        f_user_follow.save()
+        user_to_follow_follow.save()
 
-        return JsonResponse({'is_follow': int(data_post['is_followed']) ^ 1, 'followers': F('followers') + 1})
+        return JsonResponse({'is_follow': int(data_post['is_followed']) ^ 1, 'followers': user_to_follow_follow.followers.count()})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -194,10 +201,11 @@ class UserProfileView(TemplateView):
         context['following'] = current_user_follow.following.count()
         context['current_user'] = current_user
         context['user'] = user
-        context['posts'] = Post.objects.filter(user=user)
-        context['post_am'] = Post.objects.filter(user=user).count()
+        context['posts'] = Post.objects.filter(author=user)
+        context['post_am'] = context['posts'].count()
 
         return context
+
 
 
 class LoginPage(LoginView):

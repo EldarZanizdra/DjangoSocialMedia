@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}<title>{{ title }}</title>{% endblock %}
-
+{% block title %}<title>{{ user.username }} Profile</title>{% endblock %}
+{% block import %}
+    {% load static %}
+    <script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}
 {% block content %}
     <div class="col-md-9 col-lg-10">
         <div class="block profile_info">
@@ -8,10 +11,14 @@
                 <img src="{{ user.image.url }}" class="profile_ava">
             </div>
             <div class="profile_data my-3">
-                {% csrf_token %}
                 <p class="text-white my-3"><b>{{ user.username }}</b></p>
                 {% if current_user != user %}
-                    <button id="follow" data-id="{{ user.id }}" data-url="{% url 'follow_user' user.id %}" class="{% if is_followed %}profile_unfol{% else %}profile_fol{% endif %}">
+                    <button
+                        id="follow"
+                        data-id="{{ user.id }}"
+                        data-url="{% url 'user_profile' pk=user.id %}"
+                        data-for="{% if is_followed %}1{% else %}0{% endif %}"
+                        class="{% if is_followed %}profile_unfol{% else %}profile_fol{% endif %}">
                         <span id="action">{% if is_followed %}Unfollow{% else %}Follow{% endif %}</span>
                     </button>
                 {% endif %}
@@ -22,16 +29,25 @@
             <p class="my-3 text-center text-white">Posts</p>
         </div>
         <div class="posts">
-            {% if posts %}
-                {% for p in posts %}
-                    <div class="fill mx-1">
-                        <a><img class="post_image my-2" data-id="{{ p.id }}" src="{{ p.image.url }}"></a>
-                    </div>
-                {% endfor %}
-            {% endif %}
+            {% for post in posts %}
+                <div class="fill mx-1">
+                    <a href="{% url 'post_detail' pk=post.id %}">
+                        <img class="post_image my-2" src="{{ post.image.url }}" alt="{{ post.title }}">
+                    </a>
+                </div>
+            {% endfor %}
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="{% static 'path/to/ajax_functions.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var isFollowed = $('#follow').data('for') === 1;
+            $('#follow').toggleClass('profile_fol profile_unfol', !isFollowed);
+            $('#action').text(isFollowed ? 'Unfollow' : 'Follow');
+            userFollow();
+        });
+    </script>
 {% endblock %}
+
+
