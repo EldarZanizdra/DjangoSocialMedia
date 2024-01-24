@@ -12,6 +12,7 @@ class User(AbstractUser):
     website = models.CharField(max_length=250, null=True, default='', blank=True)
     image = models.ImageField(upload_to='media/profs/', default='media/profs/default.png')
 
+
 class Follow(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     followers = models.ManyToManyField(User, related_name='followers', blank=True)
@@ -45,13 +46,17 @@ class Comment(models.Model):
 
 
 class Like(Abstract):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, null=True, blank=True)
 
 
 class Chat(models.Model):
-   user1 = models.ForeignKey(User, related_name='user1', on_delete=models.CASCADE)
-   user2 = models.ForeignKey(User, related_name='user2', on_delete=models.CASCADE)
+    user1 = models.ForeignKey(User, related_name='user1_chats', on_delete=models.CASCADE)
+    user2 = models.ForeignKey(User, related_name='user2_chats', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Chat between {self.user1.username} and {self.user2.username}"
 
 
 class Message(models.Model):

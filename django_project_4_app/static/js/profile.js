@@ -1,39 +1,51 @@
 function userFollow() {
     $('#follow').click(function () {
         var follow = $(this);
-        $.ajax(follow.data('url'), {
-            'type': 'POST',
-            'async': true,
-            'dataType': 'json',
-            'data': {
+        $.ajax({
+            type: 'POST',
+            url: follow.data('url'),
+            dataType: 'json',
+            data: {
                 'follow': follow.data('id'),
-                'is_followed': document.getElementById('is_follow').dataset.for,
-                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                'is_followed': $('#follow').data('for'),
             },
-            'success': function (data) {
-                if (data['is_follow'] == 1) {
-                    document.getElementById('is_follow').dataset.for = 1;
-                    document.getElementById('follow').className = 'profile_unfol';
-                    document.getElementById('followers').innerHTML = data['followers'];
-                    document.getElementById('action').innerHTML = 'Unfollow';
-                } else {
-                    document.getElementById('is_follow').dataset.for = 0;
-                    document.getElementById('follow').className = 'profile_fol';
-                    document.getElementById('followers').innerHTML = data['followers'];
-                    document.getElementById('action').innerHTML = 'Follow';
-                }
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            success: function (data) {
+                var isFollowed = data['is_follow'] === 1;
+                $('#follow').data('for', isFollowed ? 1 : 0);
+                $('#follow').toggleClass('profile_fol profile_unfol', !isFollowed);
+                $('#followers').text(data['followers']);
+                $('#action').text(isFollowed ? 'Unfollow' : 'Follow');
+            },
+            error: function (error) {
+                console.log(error);
             }
         });
     });
 }
 
-$(document).ready(function () {
-    if (document.getElementById('is_follow').dataset.for == '0') {
-        document.getElementById('follow').className = 'profile_fol';
-        document.getElementById('action').innerHTML = 'Follow';
-    } else {
-        document.getElementById('follow').className = 'profile_unfol';
-        document.getElementById('action').innerHTML = 'Unfollow';
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
+    return cookieValue;
+}
+
+$(document).ready(function () {
+    var isFollowed = $('#follow').data('for') === 1;
+    $('#follow').toggleClass('profile_fol profile_unfol', !isFollowed);
+    $('#action').text(isFollowed ? 'Unfollow' : 'Follow');
     userFollow();
 });
+
+

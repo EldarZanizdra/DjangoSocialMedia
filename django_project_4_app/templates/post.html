@@ -1,10 +1,25 @@
 {% extends 'base.html' %}
-
 {% block title %}Post Detail{% endblock %}
-
+{% block import %}
+    {% load static %}
+    <script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
 {% block content %}
   <h2>{{ post.title }}</h2>
   <p>{{ post.content }} - {{ post.author }}</p>
+
+  <div class="likes" data-id="{{ post.id }}">
+    <button id="like-btn" data-url="{% url 'like_post' pk=post.id %}" data-id="{{ post.id }}">
+        {% if user_likes_post %}
+            Unlike
+        {% else %}
+            Like
+        {% endif %}
+    </button>
+    <span class="like_amount">{{ post.likes.count }}</span>
+    <span class="is_liked" data-for="{% if user_likes_post %}1{% else %}0{% endif %}"></span>
+  </div>
+
   {% if post.image %}
     <img src="{{ post.image.url }}" alt="Post Image">
   {% endif %}
@@ -28,12 +43,7 @@
   {% endif %}
 
   <a href="{% url 'home' %}">Go to Home</a>
+
 {% endblock %}
-
-
-
-
-
-
 
 

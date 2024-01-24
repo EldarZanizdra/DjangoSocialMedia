@@ -11,8 +11,8 @@ urlpatterns = [
     path('search/', views.SearchView.as_view(), name='search'),
     path('edit_post/<int:pk>/', views.PostEditView.as_view(), name='edit_post'),
     path('user_profile/<int:pk>/', views.UserProfileView.as_view(), name='user_profile'),
-    # path('post/<int:pk>/like/', views.PostView.as_view(), name='like_post'),
-    # path('comment/<int:comment_id>/like/', views.PostView.as_view(), name='like_comment'),
-
+    path('post/<int:pk>/like/', views.PostView.as_view(), name='like_post'),
+    path('start-chat/<int:user_id>/', views.StartChatView.as_view(), name='start_chat'),
+    path('chats/', views.ChatsView.as_view(), name='chats'),
 ]
 

@@ -15,10 +15,8 @@ $(function(){
                 'success': function(data){
                     var resultsContainer = document.getElementById('results');
 
-                    // Clear previous results
                     resultsContainer.innerHTML = '';
 
-                    // Display each user's information
                     resultsContainer.innerHTML = data.results;
                 },
                 'error': function(xhr, status, error){

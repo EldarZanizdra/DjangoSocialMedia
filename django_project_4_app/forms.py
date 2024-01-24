@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Post
-from .models import User, Comment
+from .models import User, Comment, Chat, Message
 
 
 class SearchForm(forms.Form):
@@ -26,7 +26,8 @@ class RegistrationForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
-    remember_me = forms.BooleanField(required=False, initial=True, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    remember_me = forms.BooleanField(required=False, initial=True,
+                                     widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
 
     class Meta:
         model = User
@@ -37,8 +38,16 @@ class LoginForm(AuthenticationForm):
         }
 
 
-class SendMessageForm(forms.Form):
-    content = forms.CharField(max_length=500, widget=forms.TextInput(attrs={'placeholder': 'Type your message...', 'required': True}))
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['text']
+
+
+class ChatForm(forms.ModelForm):
+    class Meta:
+        model = Chat
+        fields = '__all__'
 
 
 class PostForm(forms.ModelForm):

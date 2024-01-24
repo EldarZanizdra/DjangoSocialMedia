@@ -1,22 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h2>Chat between {{ chat.user1.username }} and {{ chat.user2.username }}</h2>
-
-  <div id="chat-messages">
-    {% for message in messages %}
-      <p>{{ message.sender.username }}: {{ message.content }} - {{ message.timestamp }}</p>
-    {% endfor %}
-  </div>
-
-  <form method="post" action="{% url 'send_message' chat.id %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Send</button>
-  </form>
-</body>
-</html>
+<div>
+    <div class="my-3" style="overflow-y: scroll; height: 600px;">
+        {% if messages %}
+            <div id="messages" class="container">
+                {% for m in messages %}
+                    <div class="row">
+                        <div>
+                            {% if m.user == user %}
+                                <p class="u_msg float-end">{{ m.text }}</p><br>
+                            {% else %}
+                                <p class="msg">{{ m.text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        <form id="message-form">
+            {% csrf_token %}
+            {{ form.text }}
+            <button type="submit" class="btn_snd" data-url="{% url 'send_message' chat.id %}">Send</button>
+        </form>
+    </div>
+</div>

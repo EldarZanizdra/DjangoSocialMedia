@@ -2,6 +2,11 @@
 
 {% block title %}Home{% endblock %}
 
+{% block import %}
+    {% load static %}
+    <script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
+
 {% block content %}
   <h2>Home</h2>
 
@@ -12,17 +17,19 @@
   {% endif %}
   <ul>
     {% for post in posts %}
-      <li>
+      <li class="post-item">
         <a href="{% url 'post_detail' pk=post.pk %}">Details</a>
-        <!-- Display Post Image if available -->
         {% if post.image %}
-            <img src="{{ post.image.url }}" alt="Post Image">
+          <img src="{{ post.image.url }}" alt="Post Image">
         {% endif %}
       </li>
     {% endfor %}
   </ul>
   <a href="{% url 'create_post' %}">Create Post</a>
 {% endblock %}
+
+
+
 
 
 
