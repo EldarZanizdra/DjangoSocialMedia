@@ -2,23 +2,26 @@
 {% block title %}Post Detail{% endblock %}
 {% block import %}
     {% load static %}
-    <script src="{% static 'js/home.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'js/likes.js' %}"></script>
+    <script src="{% static 'js/comments.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
 {% endblock %}
 {% block content %}
-  <h2>{{ post.title }}</h2>
+<h2>{{ post.title }}</h2>
   <p>{{ post.content }} - {{ post.author }}</p>
-
-  <div class="likes" data-id="{{ post.id }}">
-    <button id="like-btn" data-url="{% url 'like_post' pk=post.id %}" data-id="{{ post.id }}">
-        {% if user_likes_post %}
-            Unlike
-        {% else %}
-            Like
-        {% endif %}
-    </button>
-    <span class="like_amount">{{ post.likes.count }}</span>
-    <span class="is_liked" data-for="{% if user_likes_post %}1{% else %}0{% endif %}"></span>
-  </div>
+    <div class="likes" data-id="{{ post.id }}">
+        <button class="like_btn" data-url="{% url 'post_detail' pk=post.id %}" data-id="{{ post.id }}">
+            {% csrf_token %}
+            {% if user_likes_post %}
+                Unlike
+            {% else %}
+                Like
+            {% endif %}
+        </button>
+        <span class="like_amount">{{ like_count }}</span>
+        <span class="is_liked" data-for="{% if user_likes_post %}1{% else %}0{% endif %}"></span>
+    </div>
 
   {% if post.image %}
     <img src="{{ post.image.url }}" alt="Post Image">
@@ -30,20 +33,18 @@
       <li>{{ comment.body }} - {{ comment.author.username }}</li>
     {% endfor %}
   </ul>
-
-  <h3>Add a Comment:</h3>
+<h3>Add a Comment:</h3>
   <form method="post" action="{% url 'post_detail' pk=post.id %}">
     {% csrf_token %}
     {{ comment_form.as_p }}
-    <button type="submit" name="comment_submit">Add Comment</button>
+    <button type="submit" name="comment_submit" id="btn_com">Add Comment</button>
   </form>
 
   {% if user.is_authenticated and user == post.author %}
     <h3><a href="{% url 'edit_post' pk=post.id %}">Edit Post</a></h3>
   {% endif %}
-
   <a href="{% url 'home' %}">Go to Home</a>
-
 {% endblock %}
+
 
 

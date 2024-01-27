@@ -1,26 +1,52 @@
-<div>
-    <div class="my-3" style="overflow-y: scroll; height: 600px;">
-        {% if messages %}
-            <div id="messages" class="container">
-                {% for m in messages %}
-                    <div class="row">
-                        <div>
-                            {% if m.user == user %}
-                                <p class="u_msg float-end">{{ m.text }}</p><br>
-                            {% else %}
-                                <p class="msg">{{ m.text }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
+{% extends 'base.html' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header text-center">
+            <h2>Chat</h2>
+          </div>
+
+          <div class="card-body">
+            <div id="chat-container">
+              <div id="messages">
+                <!-- Chat messages go here -->
+              </div>
+
+              <div id="input-container">
+                <form method="post" id="chat-form">
+                  {% csrf_token %}
+                  <!-- Your chat form fields go here -->
+                  <button type="submit" class="btn btn-primary" id="btn">Send</button>
+                </form>
+              </div>
             </div>
-        {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
-    <div>
-        <form id="message-form">
-            {% csrf_token %}
-            {{ form.text }}
-            <button type="submit" class="btn_snd" data-url="{% url 'send_message' chat.id %}">Send</button>
-        </form>
-    </div>
-</div>
+  </div>
+{% endblock %}
+
+
+{% block import %}
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'styles/chat.css' %}" type="text/css">
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+

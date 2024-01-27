@@ -4,15 +4,17 @@ from .models import User, Post, Comment, Message, Chat, Follow, Like
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import (RegistrationForm, LoginForm, PostForm, CommentForm,
-                    SearchForm, ChatForm, MessageForm)
-
+                    SearchForm, MessageForm)
+from django.urls import reverse
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView, FormView
 from django.views.generic.base import TemplateView, RedirectView
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.db.models import Q
+from django.http import HttpResponseBadRequest
 
 # Create your views here.
 
@@ -43,45 +45,64 @@ class ProfileView(TemplateView):
             return render(request, self.template_name, context)
 
 
-class StartChatView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        user = self.request.user
-        user1 = get_object_or_404(User, id=self.kwargs['user_id'])
-        for c in Chat.objects.all():
-            if user in c.members.all() and user1 in c.members.all():
-                self.url = '/chats'
-                break
+class ChatNewView(TemplateView):
+    template_name = 'chat.html'
+
+    def get(self, request, **kwargs):
+        if self.kwargs['id'] == self.request.user.id:
+            return redirect('/')
         else:
-            chat = Chat()
-            chat.save()
-            chat.members.add(user, user1)
-            self.url = '/chats'
-        return super().get_redirect_url(*args, **kwargs)
-
-
-class ChatsView(TemplateView):
-    template_name = 'chats.html'
-
-    def post(self, request):
-        data_post = request.POST
-        user = self.request.user
-        chat = get_object_or_404(Chat, id=data_post['chat'])
-
-        if 'message' in data_post.keys():
-            form = MessageForm(data=data_post)
-            if form.is_valid():
-                message = form.save(commit=False)
-                message.user = user
-                message.chat = chat
-                message.save()
-                return JsonResponse({'message': message.text}, safe=False)
+            chat = Chat.objects.filter(user1=User.objects.get(id=self.kwargs['id']), user2=self.request.user)
+            if not chat:
+                chat = Chat.objects.filter(user2=User.objects.get(id=self.kwargs['id']), user1=self.request.user)
+                if not chat:
+                    chat = Chat(user1=self.request.user, user2=User.objects.get(id=self.kwargs['id']))
+                    chat.save()
+                else:
+                    chat = chat[0]
             else:
-                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+                chat = chat[0]
+            return redirect(f'/chat/{chat.id}')
 
-        messages = Message.objects.filter(chat=chat)
-        form = MessageForm()
-        result = render_to_string('chat.html', {'messages': messages, 'form': form, 'chat': chat, 'user': user})
-        return JsonResponse(result, safe=False)
+
+class ChatView(TemplateView):
+    template_name = 'chat.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chat = Chat.objects.get(id=self.kwargs['id'])
+        user = self.request.user
+        if not chat or (chat.user1 != user and chat.user2 != user):
+            return redirect('/')
+
+        talker = chat.user2 if chat.user1 == user else chat.user1
+        context['title'] = f'Chat with {talker}'
+        context['talker'] = talker
+        context['user'] = user
+        context['chat'] = chat
+        context['messages'] = chat.messages.filter(chat=chat.id)
+        context['form'] = MessageForm()
+        return context
+
+    def post(self, request, **kwargs):
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            chat = Chat.objects.get(id=kwargs['id'])
+            try:
+                message = Message.objects.create(text=form.cleaned_data['text'], chat=chat, user=self.request.user)
+            except Exception as e:
+                print(f"Error creating message: {e}")
+                return HttpResponseBadRequest("Error creating message")
+
+            chat.messages.add(message)
+            chat.save()
+            resp = {'message': message.text}
+        else:
+            # Print form errors for debugging
+            print(f"Form errors: {form.errors}")
+            resp = {'message': 'ERROR'}
+
+        return JsonResponse(resp, safe=False)
 
 
 class CreatePostView(TemplateView):
@@ -109,11 +130,16 @@ class PostView(TemplateView):
     def get_context_data(self, **kwargs):
         context = {}
         post = get_object_or_404(Post, id=self.kwargs['pk'])
+        comments = Comment.objects.filter(post=post)
+        user_likes_post = Like.objects.filter(post=post, user=self.request.user).exists()
+        like_count = len(Like.objects.filter(post=post))
+
         context['post'] = post
-        context['comments'] = Comment.objects.filter(post=post)
+        context['comments'] = comments
         context['comment_form'] = CommentForm()
-        context['post_edit_form'] = PostForm(instance=post)
-        context['user_likes_post'] = Like.objects.filter(post=post, user=self.request.user).exists()
+        context['user_likes_post'] = user_likes_post
+        context['like_count'] = like_count
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -125,9 +151,11 @@ class PostView(TemplateView):
             if comment_form.is_valid():
                 body = comment_form.cleaned_data['body']
                 Comment.objects.create(post=post, body=body, author=request.user)
+
         elif 'post_edit_submit' in request.POST:
             if post_edit_form.is_valid() and post.author == request.user:
                 post_edit_form.save()
+
         elif 'like_submit' in request.POST:
             user_likes_post = Like.objects.filter(post=post, user=request.user).exists()
             if not user_likes_post:
@@ -137,15 +165,11 @@ class PostView(TemplateView):
                 Like.objects.filter(post=post, user=request.user).delete()
                 liked = False
 
-            context = self.get_context_data()
-            context['user_likes_post'] = liked
+            like_count = len(Like.objects.filter(post=post))
 
-            return JsonResponse({'success': True, 'liked': liked, 'like_am': post.likes.count})
+            return JsonResponse({'success': True, 'liked': liked, 'like_am': like_count})
 
-        context = self.get_context_data()
-        context['user_likes_post'] = Like.objects.filter(post=post, user=request.user).exists()
-
-        return self.render_to_response(context)
+        return HttpResponseRedirect(request.path)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -195,7 +219,6 @@ class RegistrationView(CreateView):
 
     def get_success_url(self, **kwargs):
         response = HttpResponse()
-        response.set_cookie('name', 'Bob')
         return '/'
 
 
@@ -259,11 +282,21 @@ class UserProfileView(TemplateView):
 class LoginPage(LoginView):
     template_name = 'login.html'
     form_class = LoginForm
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        return response
 
 
 class LogoutPage(LogoutView):
-    pass
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        return response
 
 
 class HomePageView(TemplateView):
@@ -272,7 +305,6 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Handle search query
         search_query = self.request.GET.get('search', '')
         users = User.objects.filter(username__icontains=search_query)
 

@@ -51,15 +51,14 @@ class Like(Abstract):
     comment = models.ForeignKey('Comment', on_delete=models.CASCADE, null=True, blank=True)
 
 
-class Chat(models.Model):
-    user1 = models.ForeignKey(User, related_name='user1_chats', on_delete=models.CASCADE)
-    user2 = models.ForeignKey(User, related_name='user2_chats', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Chat between {self.user1.username} and {self.user2.username}"
-
-
 class Message(models.Model):
-   text = models.CharField(max_length=1024)
-   chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-   user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.CharField(max_length=1024)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    modifiedAt = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Chat(models.Model):
+    user1 = models.ForeignKey(User, related_name='user1', on_delete=models.CASCADE, default='some_default_value')
+    user2 = models.ForeignKey(User, related_name='user2', on_delete=models.CASCADE)
+    messages = models.ManyToManyField(Message)

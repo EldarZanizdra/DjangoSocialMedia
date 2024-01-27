@@ -1,0 +1,24 @@
+/* Styles for Chat Component */
+
+#chat-container {
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#messages {
+    padding: 10px;
+}
+
+.u_msg {
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+#input-container {
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #dbdbdb;
+}

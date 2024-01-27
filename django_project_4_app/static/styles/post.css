@@ -1,0 +1,31 @@
+/* Styles for Create Post and Edit Post */
+
+.card {
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    background-color: #3897f0;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #ced4da;
+    border: none;
+}
+

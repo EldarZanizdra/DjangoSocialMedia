@@ -21,7 +21,7 @@
                         class="{% if is_followed %}profile_unfol{% else %}profile_fol{% endif %}">
                         <span id="action">{% if is_followed %}Unfollow{% else %}Follow{% endif %}</span>
                     </button>
-                    <a href="{% url 'start_chat' user_id=user.id %}" class="btn btn-primary">Chat with {{ user.username }}</a>
+                    <a class="profile_fol mx-2" href="/chatNew/{{ user.id }}"><b>Message</b></a>
                 {% endif %}
                 <p class="text-white my-3">Followers: <span id="followers">{{ followers }}</span> | Following: {{ following }}</p>
             </div>

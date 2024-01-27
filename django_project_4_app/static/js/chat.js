@@ -1,20 +1,30 @@
-$(document).ready(function() {
-    $(document).on('click', '#input', function() {
-        var btn = $(this);
-        console.log(btn);
-
-        $.ajax(btn.data('url'), {
-            type: 'POST',
-            async: true,
-            dataType: 'json',
-            data: {
-                'message': $('#id_body').val(),
-                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+function sendMessage() {
+    $('#btn').click(function () {
+        var button = $(this);
+        $.ajax(button.data('url'), {
+            'type': 'POST',
+            'async': true,
+            'dataType': 'json',
+            'data': {
+                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                'typeSend': true,
+                'text': $('#text').val()
             },
-            success: function(data) {
-                $('#messages').append('<p class="u_msg">' + data.message + '</p><br>');
-                $('#id_body').val('');
+            'success': function (data) {
+                if (data && data.message) {
+                    appendMessage(data.message);
+                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                }
             }
         });
     });
+}
+
+function appendMessage(text) {
+    $('#messages').append('<p class="u_msg">' + text + '</p>');
+    $('#id_text').val('');
+}
+
+$(document).ready(function () {
+    sendMessage();
 });

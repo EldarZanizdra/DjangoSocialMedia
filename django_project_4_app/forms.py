@@ -42,12 +42,7 @@ class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ['text']
-
-
-class ChatForm(forms.ModelForm):
-    class Meta:
-        model = Chat
-        fields = '__all__'
+        widgets = {'text': forms.TextInput(attrs={'id': 'text'})}
 
 
 class PostForm(forms.ModelForm):
