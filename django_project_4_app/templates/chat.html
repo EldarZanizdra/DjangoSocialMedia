@@ -19,7 +19,9 @@
                         <span class="message-text">{{ m.text }}</span>
                         <span class="message-user">{{ m.user.username }}</span>
                     </p>
-                    <button class="edit-btn" data-message-id="{{ m.id }}">Edit</button>
+                    {% if m.user == user %} {# Check if the message sender is the current user #}
+                        <button class="edit-btn" data-message-id="{{ m.id }}">Edit</button>
+                    {% endif %}
                 </div>
               {% endfor %}
           </div>
@@ -33,3 +35,4 @@
       </div>
   </centerSide>
 {% endblock %}
+

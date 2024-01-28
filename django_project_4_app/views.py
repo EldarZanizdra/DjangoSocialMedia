@@ -36,7 +36,6 @@ class ProfileView(TemplateView):
 
         return context
 
-
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
         if form.is_valid():

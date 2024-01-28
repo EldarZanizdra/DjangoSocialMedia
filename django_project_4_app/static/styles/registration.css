@@ -23,6 +23,10 @@ label[for="id_website"] {
     border-color: #dc3545;
 }
 
+.card {
+    min-height: 600px;;
+}
+
 .btn-primary {
     background-color: #3897f0;
     border-color: #3897f0;
