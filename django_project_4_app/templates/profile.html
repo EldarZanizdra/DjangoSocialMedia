@@ -2,23 +2,45 @@
 
 {% block title %}Profile{% endblock %}
 
-{% block content %}
-  <h2>Profile</h2>
-  <p>{{ user.username }}</p>
-  <a href="{% url 'create_post' %}">Create Post</a>
-
-  <h3>Your Posts:</h3>
-  <ul>
-    {% for post in posts %}
-      <li>
-        {{ post.content }} - {{ post.created_at }}
-      </li>
-    {% endfor %}
-  </ul>
-
-  <h3>Followers: {{ followers_count }}</h3>
-  <h3>Following: {{ following_count }}</h3>
+{% block import %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles/profile.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 {% endblock %}
+
+{% block content %}
+  <div class="container profile-container">
+    <h2>Profile</h2>
+    <p class="lead">{{ user.username }}</p>
+      <a>{{ user.bio }}</a><br>
+    <a href="{% url 'create_post' %}" class="btn btn-primary">Create Post</a>
+
+    <h3 class="mt-4">Your Posts:</h3>
+    <ul class="profile-posts">
+      {% for post in posts %}
+        <li>
+          {{ post.content }} - {{ post.created_at }}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="profile-stats">
+        <button type="button" class="btn btn-link" id="followersBtn">Followers: {{ followers_count }}</button>
+        <button type="button" class="btn btn-link" id="followingBtn">Following: {{ following_count }}</button>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer"></div>
+  </div>
+
+  <script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}
+
+
 
 
 

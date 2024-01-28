@@ -2,7 +2,7 @@
     {% if results %}
         {% for p in results %}
             <div class="my-2">
-                <a href="/profile/{{ p.user.id }}"><img class="profile-image pr-3" src="{{ p.image.url }}" width="50" height="50"></a>
+                <a href="/user_profile/{{ p.id }}"><img class="profile-image pr-3" src="{{ p.image.url }}" width="50" height="50"></a>
                 <a class="profile_link mx-2" href="/user_profile/{{ p.id }}"><b>{{ p.username }}</b></a><br>
             </div>
         {% endfor %}

@@ -1,0 +1,35 @@
+#id_bio,
+#id_gender,
+#id_website {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+label[for="id_bio"],
+label[for="id_gender"],
+label[for="id_website"] {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#id_bio:invalid,
+#id_gender:invalid,
+#id_website:invalid {
+    border-color: #dc3545;
+}
+
+.btn-primary {
+    background-color: #3897f0;
+    border-color: #3897f0;
+}
+
+.btn-primary:hover {
+    background-color: #2661a8;
+    border-color: #2661a8;
+}
+

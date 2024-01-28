@@ -1,0 +1,54 @@
+.profile_info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.profile_image img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header .logo {
+    margin-right: 500px;
+}
+
+.profile_data {
+    text-align: center;
+}
+
+.profile_data h2 {
+    margin-bottom: 10px;
+}
+
+.profile_button {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.follow {
+    background-color: #007bff;
+}
+
+.following {
+    background-color: #28a745;
+}
+
+.posts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.post_image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 10px;
+}

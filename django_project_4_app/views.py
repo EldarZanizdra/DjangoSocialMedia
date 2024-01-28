@@ -5,16 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .forms import (RegistrationForm, LoginForm, PostForm, CommentForm,
                     SearchForm, MessageForm)
-from django.urls import reverse
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView, FormView
-from django.views.generic.base import TemplateView, RedirectView
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -24,13 +23,19 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['posts'] = Post.objects.filter(author=self.request.user)
+        user = self.request.user
+
+        context['posts'] = Post.objects.filter(author=user)
         context['form'] = PostForm()
 
-        context['followers_count'] = Follow.objects.filter(following=self.request.user).count()
-        context['following_count'] = Follow.objects.filter(followers=self.request.user).count()
+        context['followers'] = Follow.objects.filter(following=user).values_list('followers__username', flat=True)
+        context['following'] = Follow.objects.filter(followers=user).values_list('following__username', flat=True)
+
+        context['followers_count'] = Follow.objects.filter(following=user).count()
+        context['following_count'] = Follow.objects.filter(followers=user).count()
 
         return context
+
 
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
@@ -38,11 +43,24 @@ class ProfileView(TemplateView):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('profile')
         else:
             context = self.get_context_data()
             context['form'] = form
             return render(request, self.template_name, context)
+
+
+def get_followers(request):
+    user = request.user
+    followers = Follow.objects.filter(following=user).values('followers__id', 'followers__username')
+    results = render_to_string('followers_results.html', {'results': followers})
+    return JsonResponse({'results': results}, safe=False)
+
+
+def get_following(request):
+    user = request.user
+    following = Follow.objects.filter(followers=user).values('following__id', 'following__username')
+    results = render_to_string('following_results.html', {'results': following})
+    return JsonResponse({'results': results}, safe=False)
 
 
 class ChatNewView(TemplateView):
@@ -65,40 +83,66 @@ class ChatNewView(TemplateView):
             return redirect(f'/chat/{chat.id}')
 
 
+@method_decorator(login_required, name='dispatch')
 class ChatView(TemplateView):
     template_name = 'chat.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        chat = Chat.objects.get(id=self.kwargs['id'])
+        chat_id = self.kwargs.get('id')
+
+        try:
+            chat = Chat.objects.get(id=chat_id)
+        except Chat.DoesNotExist:
+            return redirect('/')
+
         user = self.request.user
-        if not chat or (chat.user1 != user and chat.user2 != user):
+        if user not in [chat.user1, chat.user2]:
             return redirect('/')
 
         talker = chat.user2 if chat.user1 == user else chat.user1
+
         context['title'] = f'Chat with {talker}'
         context['talker'] = talker
         context['user'] = user
         context['chat'] = chat
         context['messages'] = chat.messages.filter(chat=chat.id)
         context['form'] = MessageForm()
+
         return context
 
     def post(self, request, **kwargs):
         form = MessageForm(request.POST)
         if form.is_valid():
-            chat = Chat.objects.get(id=kwargs['id'])
+            chat_id = kwargs.get('id')
             try:
-                message = Message.objects.create(text=form.cleaned_data['text'], chat=chat, user=self.request.user)
-            except Exception as e:
-                print(f"Error creating message: {e}")
-                return HttpResponseBadRequest("Error creating message")
+                chat = Chat.objects.get(id=chat_id)
+            except Chat.DoesNotExist:
+                return HttpResponseBadRequest("Chat does not exist")
 
-            chat.messages.add(message)
-            chat.save()
-            resp = {'message': message.text}
+            message_id = request.POST.get('message_id')
+            if message_id:
+                try:
+                    message = Message.objects.get(id=message_id, chat=chat)
+                    message.text = form.cleaned_data['text']
+                    message.save()
+                except Message.DoesNotExist:
+                    return HttpResponseBadRequest("Message does not exist")
+            else:
+                try:
+                    message = Message.objects.create(
+                        text=form.cleaned_data['text'],
+                        chat=chat,
+                        user=self.request.user
+                    )
+                except Exception as e:
+                    print(f"Error creating message: {e}")
+                    return HttpResponseBadRequest("Error creating message")
+
+                chat.messages.add(message)
+
+            resp = {'message': message.text, 'sender': message.user.username}
         else:
-            # Print form errors for debugging
             print(f"Form errors: {form.errors}")
             resp = {'message': 'ERROR'}
 
@@ -201,15 +245,6 @@ class PostEditView(TemplateView):
 
         return redirect('post_detail', pk=post.id)
 
-    def post(self, request, *args, **kwargs):
-        post = get_object_or_404(Post, id=self.kwargs['pk'])
-        post_edit_form = PostForm(request.POST, request.FILES, instance=post)
-
-        if post_edit_form.is_valid():
-            post_edit_form.save()
-
-        return redirect('post_detail', pk=post.id)
-
 
 class RegistrationView(CreateView):
     template_name = 'registration.html'
@@ -301,6 +336,7 @@ class LogoutPage(LogoutView):
 
 class HomePageView(TemplateView):
     template_name = 'home.html'
+    posts_per_page = 4
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -313,7 +349,9 @@ class HomePageView(TemplateView):
         else:
             posts = Post.objects.all()
 
-        context['posts'] = posts
+        paginator = Paginator(posts, self.posts_per_page)
+        page = self.request.GET.get('page', 1)
+        context['posts'] = paginator.get_page(page)
         context['search_query'] = search_query
 
         return context

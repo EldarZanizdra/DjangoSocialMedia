@@ -1,25 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     {% block import %}
     {% load static %}
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
     {% endblock %}
 </head>
+
 <body class="instagram-style">
     <header class="header">
-        <div class="logo">Your Logo</div>
-        <nav class="nav">
-            <a class='nav mt-4' href="/registration"> <text class="nav_link">Register</text></a><br>
-            <a class='nav mt-4' href="/login"> <text class="nav_link">Login</text></a><br>
-            <a class='nav mt-4' href="/search"> <text class="nav_link">Search</text></a><br>
-            <a class='nav mt-4' href="/profile"> <text class="nav_link">Profile</text></a><br>
-        </nav>
+        <div class="container">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-6">
+                    <div class="logo">
+                        <a href="{% url 'home' %}">Home</a>
+                    </div>
+                </div>
+                <div class="col-6 text-end">
+                    <nav class="nav">
+                        <a class="nav-link" href="/registration">Register</a>
+                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="/search">Search</a>
+                        <a class="nav-link" href="/profile">Profile</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
     </header>
 
     <main class="main-content">
@@ -36,16 +50,25 @@
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="/about">About</a>
-            <a href="/help">Help</a>
-            <a href="/terms">Terms</a>
-            <a href="/privacy">Privacy</a>
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-6">
+                    <div class="footer-links">
+                        <a class="footer-link" href="#">About</a>
+                        <a class="footer-link" href="#">Help</a>
+                        <a class="footer-link" href="#">Terms</a>
+                        <a class="footer-link" href="#">Privacy</a>
+                    </div>
+                </div>
+                <div class="col-6 text-end">
+                    <div class="copyright">&copy; 2024 Your Company</div>
+                </div>
+            </div>
         </div>
-        <div class="copyright">&copy; 2024 Your Company</div>
     </footer>
 
     {% block extra %}{% endblock %}
 </body>
+
 </html>

@@ -1,52 +1,35 @@
-{% extends 'base.html' %}
-
-{% block title %}Chat{% endblock %}
-
+{% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header text-center">
-            <h2>Chat</h2>
-          </div>
-
-          <div class="card-body">
-            <div id="chat-container">
-              <div id="messages">
-                <!-- Chat messages go here -->
-              </div>
-
-              <div id="input-container">
-                <form method="post" id="chat-form">
-                  {% csrf_token %}
-                  <!-- Your chat form fields go here -->
-                  <button type="submit" class="btn btn-primary" id="btn">Send</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-{% endblock %}
-
-
-{% block import %}
+  {% block import %}
     {% load static %}
-
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'styles/chat.css' %}" type="text/css">
+  {% endblock %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="{% static 'js/chat.js' %}"></script>
+
+  <centerSide>
+      <divider>{{ talker.username }}</divider>
+
+      <div id="chat-container">
+          <div id="messages">
+              {% for m in messages %}
+                <div class="message-container">
+                    <p class="u_msg" data-message-id="{{ m.id }}">
+                        <span class="message-text">{{ m.text }}</span>
+                        <span class="message-user">{{ m.user.username }}</span>
+                    </p>
+                    <button class="edit-btn" data-message-id="{{ m.id }}">Edit</button>
+                </div>
+              {% endfor %}
+          </div>
+
+          <div id="input-container">
+              {% csrf_token %}
+              {{ form.text }}
+              <input type="hidden" id="message_id" name="message_id" value="">
+              <input type="submit" id="btn">
+          </div>
+      </div>
+  </centerSide>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-

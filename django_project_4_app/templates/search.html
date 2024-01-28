@@ -1,23 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}<title>{{ title }}</title>{% endblock %}
+{% block title %}User Search{% endblock %}
 {% block import %}
     {% load static %}
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="{% static 'js/search.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'styles/search.css' %}" type="text/css">
 {% endblock %}
 
 {% block content %}
-     <div class="col-md-7 col-lg-8 my-4">
-         <div class="mx-5">
+    <div class="col-md-7 col-lg-8 my-4">
+        <div class="mx-5">
             {% csrf_token %}
             <input type="text" name="search" id="id_search" placeholder="Enter search term">
-         </div>
-         <div id="results" class="my-4">
-         </div>
+            <div id="results" class="my-4">
+            </div>
+        </div>
     </div>
     <div class="col-md-2 col-lg-2 my-4">
         <h6 class="my-3 text-white-50">Recommendations</h6>
         <hr>
     </div>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 {% endblock %}
+

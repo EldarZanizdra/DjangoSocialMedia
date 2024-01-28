@@ -48,4 +48,45 @@ $(document).ready(function () {
     userFollow();
 });
 
+$(document).ready(function () {
+    $('#followersBtn').click(function () {
+        // Fetch followers data and update the results container
+        $.ajax({
+            url: '/get_followers/',
+            type: 'GET',
+            success: function (data) {
+                $('#resultsContainer').html(data.results);
+                makeUsernamesClickable();  // Add this line to make usernames clickable
+            },
+            error: function () {
+                console.log('Error fetching followers');
+            }
+        });
+    });
+
+    $('#followingBtn').click(function () {
+        // Fetch following data and update the results container
+        $.ajax({
+            url: '/get_following/',
+            type: 'GET',
+            success: function (data) {
+                $('#resultsContainer').html(data.results);
+                makeUsernamesClickable();  // Add this line to make usernames clickable
+            },
+            error: function () {
+                console.log('Error fetching following');
+            }
+        });
+    });
+
+    function makeUsernamesClickable() {
+        $('.clickable-username').click(function () {
+            var username = $(this).text().trim();
+            window.location.href = '/profile/' + username + '/';
+        });
+    }
+});
+
+
+
 

@@ -1,31 +1,19 @@
-/* Styles for Create Post and Edit Post */
-
-.card {
-    border: 1px solid #dbdbdb;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.card-header {
-    background-color: #fff;
-    border-bottom: 1px solid #dbdbdb;
-}
-
-.card-body {
+.post-card {
+    margin-top: 20px;
     padding: 20px;
 }
 
-.form-group {
-    margin-bottom: 20px;
+.post-card-body {
+    padding: 20px;
+    width: 100%;
 }
 
-.btn-primary {
-    background-color: #3897f0;
-    border: none;
+.post-container {
+    margin-bottom: 40px;
 }
 
-.btn-secondary {
-    background-color: #ced4da;
-    border: none;
+.btn {
+    margin-top: 20px;
 }
+
 

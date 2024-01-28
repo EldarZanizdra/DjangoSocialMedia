@@ -13,16 +13,18 @@ class RegistrationForm(UserCreationForm):
     bio = forms.CharField(max_length=200, required=False, label='Bio')
     gender = forms.CharField(max_length=50, required=False, label='Gender')
     website = forms.CharField(max_length=250, required=False, label='Website')
+    image = forms.ImageField(required=False, label='Profile Image')
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'bio', 'gender', 'website']
+        fields = ['username', 'email', 'password1', 'password2', 'bio', 'gender', 'website', 'image']
         widgets = {
             'username': forms.TextInput(attrs={'id': 'username'}),
             'email': forms.EmailInput(attrs={'id': 'email'}),
             'bio': forms.TextInput(attrs={'id': 'bio'}),
             'gender': forms.TextInput(attrs={'id': 'gender'}),
-            'website': forms.TextInput(attrs={'id': 'website'}),}
+            'website': forms.TextInput(attrs={'id': 'website'}),
+        }
 
 
 class LoginForm(AuthenticationForm):
