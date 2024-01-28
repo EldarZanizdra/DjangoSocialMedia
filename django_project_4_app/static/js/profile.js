@@ -81,7 +81,7 @@ $(document).ready(function () {
     function makeUsernamesClickable() {
         $('.clickable-username').click(function () {
             var username = $(this).text().trim();
-            window.location.href = '/profile/' + username + '/';
+            window.location.href = '/user_profile/' + "id" + '/';
         });
     }
 });

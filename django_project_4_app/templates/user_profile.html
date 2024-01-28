@@ -5,6 +5,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="{% static 'styles/users.css' %}" type="text/css">
     <script src="{% static 'js/profile.js' %}"></script>
     <link rel="stylesheet" href="{% static 'styles/base.css' %}" type="text/css">
@@ -29,7 +30,8 @@
                     </button>
                     <a class="profile_fol mx-2 text-black" href="/chatNew/{{ user.id }}"><b>Message</b></a>
                 {% endif %}
-                <p class="text-black my-3">Followers: <span id="followers">{{ followers }}</span> | Following: {{ following }}</p>
+                <p class="text-black my-3">Followers: <span id="followers">{{ followers_count }}</span> | Following: {{ following_count }}</p>
+
             </div>
         </div>
         <div>

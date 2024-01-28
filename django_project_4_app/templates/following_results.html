@@ -1,5 +1,6 @@
 <ul>
   {% for result in results %}
-    <li><a class="clickable-username" href="/user_profile/{{ result.following__id }}">{{ result.following__username }}</a></li>
+    <li><a class="clickable-username" href="/user_profile/{{ result.id }}">{{ result.username }}</a></li>
   {% endfor %}
 </ul>
+

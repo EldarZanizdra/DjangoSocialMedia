@@ -18,7 +18,7 @@ body.instagram-style {
     font-size: 1.5rem;
     font-weight: bold;
     display: inline-block;
-    position: static;
+    position: fixed;
 }
 
 .header .nav a {

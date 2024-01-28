@@ -11,7 +11,6 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
-from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.core.paginator import Paginator
 
@@ -28,11 +27,12 @@ class ProfileView(TemplateView):
         context['posts'] = Post.objects.filter(author=user)
         context['form'] = PostForm()
 
-        context['followers'] = Follow.objects.filter(following=user).values_list('followers__username', flat=True)
-        context['following'] = Follow.objects.filter(followers=user).values_list('following__username', flat=True)
+        context['followers'] = user.followers.all()
+        context['following'] = user.following.all()
 
-        context['followers_count'] = Follow.objects.filter(following=user).count()
-        context['following_count'] = Follow.objects.filter(followers=user).count()
+        context['followers_count'] = user.followers.count()
+        context['following_count'] = user.following.count()
+        context['post_count'] = Post.objects.filter(author=user).count()
 
         return context
 
@@ -45,20 +45,20 @@ class ProfileView(TemplateView):
         else:
             context = self.get_context_data()
             context['form'] = form
-            return render(request, self.template_name, context)
+            return self.render_to_response(context)
 
 
 def get_followers(request):
     user = request.user
-    followers = Follow.objects.filter(following=user).values('followers__id', 'followers__username')
-    results = render_to_string('followers_results.html', {'results': followers})
+    followers = Follow.objects.get(user=user)
+    results = render_to_string('followers_results.html', {'results': followers.following.all()})
     return JsonResponse({'results': results}, safe=False)
 
 
 def get_following(request):
     user = request.user
-    following = Follow.objects.filter(followers=user).values('following__id', 'following__username')
-    results = render_to_string('following_results.html', {'results': following})
+    following = Follow.objects.get(user=user)
+    results = render_to_string('following_results.html', {'results': following.followers.all()})
     return JsonResponse({'results': results}, safe=False)
 
 
@@ -303,10 +303,12 @@ class UserProfileView(TemplateView):
 
         context['is_followed'] = current_user_follow.following.filter(id=user.id).exists()
         context['title'] = user.username
-        context['followers'] = current_user_follow.followers.count()
-        context['following'] = current_user_follow.following.count()
+        context['followers_count'] = current_user_follow.followers.count()
+        context['following_count'] = current_user_follow.following.count()
         context['current_user'] = current_user
         context['user'] = user
+        context['followers'] = user.followers.all()
+        context['following'] = user.following.all()
         context['posts'] = Post.objects.filter(author=user)
         context['post_am'] = context['posts'].count()
 
@@ -328,9 +330,7 @@ class LoginPage(LoginView):
 
 
 class LogoutPage(LogoutView):
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        return response
+    pass
 
 
 class HomePageView(TemplateView):
